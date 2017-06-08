@@ -47,5 +47,6 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     public void test() {
         // Tolle Methode
         mMap.setMapType(1);
+        //Neuer Test
     }
 }
