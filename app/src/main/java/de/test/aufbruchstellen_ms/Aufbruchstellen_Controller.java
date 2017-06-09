@@ -77,7 +77,7 @@ public class Aufbruchstellen_Controller {
                 String posl = "gml:posList";
                 NodeList poslList = featmElement.getElementsByTagName(posl);
 
-                // Muss hier vor die for-Schleife
+                // Muss hier vor die for-Schleife noch ne Liste aller Aufbruchstellen wo dann einzelne Aufbruchstellen hinzugefügt werden?
                 for (int j = 0; j < poslList.getLength(); j++) {
                     Node poslNode = poslList.item(j);
                     Element poslElement = (Element) poslNode;
