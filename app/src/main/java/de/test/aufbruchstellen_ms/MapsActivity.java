@@ -1,7 +1,13 @@
 package de.test.aufbruchstellen_ms;
 
+import android.Manifest;
+import android.content.DialogInterface;
+import android.content.pm.PackageManager;
+import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.FragmentActivity;
 import android.os.Bundle;
+import android.support.v4.content.ContextCompat;
+import android.support.v7.app.AlertDialog;
 
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
@@ -9,10 +15,21 @@ import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MarkerOptions;
+import com.google.android.gms.maps.model.Polygon;
+import com.google.android.gms.maps.model.PolygonOptions;
+
+import java.util.ArrayList;
+import java.util.List;
 
 public class MapsActivity extends FragmentActivity implements OnMapReadyCallback {
 
+    // Attributes
     private GoogleMap mMap;
+    private ArrayList<PolygonOptions> polygonList = new ArrayList<>();
+
+    private static final int MY_PERMISSIONS_REQUEST_ACCESS_FINE_LOCATION = 1;
+    private boolean mPermissionDenied = false;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -38,17 +55,72 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     public void onMapReady(GoogleMap googleMap) {
         mMap = googleMap;
 
-        // Add a marker in Sydney and move the camera
-        LatLng sydney = new LatLng(-34, 151);
-        mMap.addMarker(new MarkerOptions().position(sydney).title("Marker in Sydney"));
-        mMap.moveCamera(CameraUpdateFactory.newLatLng(sydney));
+        // Add a marker in muenster and move the camera
+        LatLng muenster = new LatLng(7.626, 51.962);
+        mMap.moveCamera(CameraUpdateFactory.newLatLng(muenster));
+
+        // Methodenaufruf für eigenen Standort
+        enableMyLocation();
+
+        //**************************************
+        // Aufruf der Polygone
+        //Aufgrabungsstellen aufgrabung = new Aufgrabungsstellen(URL);
+        //polygonList = aufgrabung.getPolygonList();
+        addPolygon(mMap, polygonList);
+        //******************************************
     }
 
-    public void test() {
-        // Tolle Methode
-        mMap.setMapType(1);
-        //super
-        mMap.setMapType(2);
-        mMap.setMapType(3);
+    /**
+     * dt. Ueberpruefen ob Standortberechtigunbgen erteillt wurden
+     */
+    public void enableMyLocation() {
+        if (ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION)
+                == PackageManager.PERMISSION_GRANTED) {
+            mMap.setMyLocationEnabled(true);
+        } else {
+            // Berechtigung
+            ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.ACCESS_FINE_LOCATION}, MY_PERMISSIONS_REQUEST_ACCESS_FINE_LOCATION);
+        }
+    }
+
+    /**
+     * dt. Methode faengt die Antwort des Dialogfensters der Standortberechtigung ab
+     * und meldet bei fehlender Berechtigung, dass ein Standort nicht angezeigt werden
+     * @param requestCode
+     * @param permissions
+     * @param grantResults
+     * @throws SecurityException
+     */
+    public void onRequestPermissionsResult(int requestCode, String[] permissions, int[] grantResults) throws SecurityException {
+
+        if (requestCode == MY_PERMISSIONS_REQUEST_ACCESS_FINE_LOCATION) {
+
+            if (permissions.length == 1 && permissions[0].equals(Manifest.permission.ACCESS_FINE_LOCATION) && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                mMap.setMyLocationEnabled(true);
+
+            } else {
+                mPermissionDenied = true;
+                new AlertDialog.Builder(this).setMessage("Keine Anzeige des Gerätestandortes möglich!")
+                        .setNegativeButton("Akzeptieren", null)
+                        .setPositiveButton("Zurück", new DialogInterface.OnClickListener() {
+                            public void onClick(DialogInterface dialog, int which) {
+                                enableMyLocation();
+                            }
+                        }).create().show();
+            }
+        }
+    }
+
+    /**
+     * Polygone aus der Liste auslesen und in der Karte darstellen
+     * zusaetzliche die Polygone klickbar machen
+     * @param googleMap
+     * @param polygonList
+     */
+    public void addPolygon (GoogleMap googleMap, ArrayList polygonList) {
+      //for(polygon: polygonList) {
+        for(int i = 0; i < polygonList.size(); i++) {
+            mMap.addPolygon((PolygonOptions) polygonList.get(i)).setClickable(true);
+        }
     }
 }
