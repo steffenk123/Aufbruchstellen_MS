@@ -44,11 +44,5 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         mMap.moveCamera(CameraUpdateFactory.newLatLng(sydney));
     }
 
-    public void test() {
-        // Tolle Methode
-        mMap.setMapType(1);
-        //super
-        mMap.setMapType(2);
-        mMap.setMapType(3);
-    }
+
 }
