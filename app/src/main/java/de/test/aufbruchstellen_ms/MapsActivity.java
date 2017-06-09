@@ -116,6 +116,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
      * zusaetzliche die Polygone klickbar machen
      * @param googleMap
      * @param polygonList
+     *
      */
     public void addPolygon (GoogleMap googleMap, ArrayList polygonList) {
       //for(polygon: polygonList) {
