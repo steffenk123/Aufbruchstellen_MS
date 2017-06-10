@@ -7,11 +7,11 @@ import java.util.List;
  * Created by Sven Beyel on 10.06.2017.
  */
 
-public class AufrbuchstellenCollection {
-
+public class AufbruchstellenCollection {
+    
     List<Aufbruchstellen> aufbruchstellenListe;
 
-    public AufrbuchstellenCollection() {
+    public AufbruchstellenCollection() {
         aufbruchstellenListe = new ArrayList<>();
     }
 

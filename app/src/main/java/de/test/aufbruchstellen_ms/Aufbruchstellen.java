@@ -12,17 +12,20 @@ public class Aufbruchstellen {
 
     // Arraylist in Konstruktor/Getter/Setter fehlt noch
 
-    int id;
-    ArrayList<PolygonOptions> geometrie;
-    String traeger;
-    String beginn;
-    String spuren;
-    String strassen;
+    private int id;
+    private ArrayList<PolygonOptions> geometrie;
+    private String traeger;
+    private String beginn;
+    private String spuren;
+    private String strassen;
 
+    public Aufbruchstellen() {
+        this.geometrie=  new ArrayList<>();
+    }
 
-    public Aufbruchstellen(int id, ArrayList<PolygonOptions> geometrie, String traeger, String beginn, String spuren, String strassen) {
+    public Aufbruchstellen(int id, String traeger, String beginn, String spuren, String strassen) {
         this.id = id;
-        this.geometrie=  geometrie;
+        this.geometrie=  new ArrayList<>();
         this.traeger = traeger;
         this.beginn = beginn;
         this.spuren = spuren;
@@ -73,7 +76,9 @@ public class Aufbruchstellen {
         return geometrie;
     }
 
-    public void setGeometrie(ArrayList<PolygonOptions> geometrie) {
-        this.geometrie = geometrie;
+    public void addGeometrie(PolygonOptions geometrie) {
+        this.geometrie.add(geometrie);
     }
+
+
 }

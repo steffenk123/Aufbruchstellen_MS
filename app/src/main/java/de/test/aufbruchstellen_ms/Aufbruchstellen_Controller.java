@@ -10,6 +10,7 @@ import android.annotation.TargetApi;
 import android.os.Build;
 
 import com.google.android.gms.maps.model.LatLng;
+import com.google.android.gms.maps.model.PolygonOptions;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -17,15 +18,11 @@ import java.io.InputStreamReader;
 import java.io.StringReader;
 import java.net.MalformedURLException;
 import java.net.URL;
-import java.util.ArrayList;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
-
-import javax.xml.xpath.XPath;
-import javax.xml.xpath.XPathExpressionException;
 
 
 import org.w3c.dom.Document;
@@ -42,13 +39,14 @@ import org.xml.sax.SAXException;
 public class Aufbruchstellen_Controller {
 
     Aufbruchstellen aufbruchstellen;
+    AufbruchstellenCollection aufbruchstellenCollection;
 
     // CSV einlesen
     @TargetApi(Build.VERSION_CODES.ICE_CREAM_SANDWICH)
     public void getGML() {
         URL url;
         try {
-            url = new URL("https://www.stadt-muenster.de/ows/mapserv621/odaufgrabserv?REQUEST=GetFeature&SERVICE=WFS&VERSION=1.1.0&TYPENAME=aufgrabungen&EXCEPTIONS=XML&MAXFEATURES=1000&SRSNAME=EPSG:4326");
+            url = new URL("https://www.stadt-muenster.de/ows/mapserv621/odaufgrabserv?REQUEST=GetFeature&SERVICE=WFS&VERSION=1.1.0&TYPENAME=aufgrabungen&EXCEPTIONS=XML&MAXFEATURES=5000&SRSNAME=EPSG:4326");
 
             BufferedReader in = new BufferedReader(new InputStreamReader(url.openStream(), "UTF-8"));
             String inputLine;
@@ -69,9 +67,14 @@ public class Aufbruchstellen_Controller {
             String featm ="gml:featureMember";
             NodeList featmList = document.getElementsByTagName(featm);
 
+            aufbruchstellenCollection = new AufbruchstellenCollection();
+
             for(int i=0;i<featmList.getLength();i++) {
                 Node featmNode = featmList.item(i);
                 Element featmElement = (Element) featmNode;
+
+
+                aufbruchstellen = new Aufbruchstellen();
 
                 //Und dann alle Positionslisten der einzelnen featureMember
                 String posl = "gml:posList";
@@ -83,11 +86,31 @@ public class Aufbruchstellen_Controller {
                     Element poslElement = (Element) poslNode;
                     String pos = poslElement.getTextContent();
                     // muss jetzt als geometrie gesetzt werden bzw vorher noch Methode geschrieben werden die das ins richtige Format (PolygonOptions oder Polygon) konvertiert
-                    createLatLngArray(pos);
-
+                    PolygonOptions po= createPolygonOptions(createLatLngArray(pos));
+                    aufbruchstellen.addGeometrie(po);
                 }
 
-               //Hier müssten jetzt noch die weiteren Dinge wie ID, Datum etc der Aufbruchstelle hinzugefügt werden
+                // ID
+                String id = getValue("ms:id",0,featmElement);
+                aufbruchstellen.setId(Integer.parseInt(id));
+
+                // Traeger
+                String traeger = getValue("ms:vtraeger",0,featmElement);
+                aufbruchstellen.setTraeger(traeger);
+
+                // Beginn
+                String beginn = getValue("ms:beginn",0,featmElement);
+                aufbruchstellen.setBeginn(beginn);
+
+                // Spuren
+                String spuren = getValue("ms:spuren",0,featmElement);
+                aufbruchstellen.setSpuren(spuren);
+
+                // Strassen
+                String strassen = getValue("ms:strassen",0,featmElement);
+                aufbruchstellen.setStrassen(strassen);
+
+                aufbruchstellenCollection.addAufbruchstelle(aufbruchstellen);
 
             }
 
@@ -116,6 +139,17 @@ public class Aufbruchstellen_Controller {
         return point;
     }
 
-    //Test
+    public PolygonOptions createPolygonOptions(LatLng[] latlng){
+        return new PolygonOptions().add(latlng);
+    }
+
+    public String getValue(String string, int i, Element featmElement){
+
+        NodeList nodeList = featmElement.getElementsByTagName(string);
+        Node node = nodeList.item(i);
+        Element element = (Element) node;
+        String res = element.getTextContent();
+        return res;
+    }
 
  }

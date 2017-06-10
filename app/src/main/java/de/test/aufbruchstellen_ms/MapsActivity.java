@@ -3,6 +3,7 @@ package de.test.aufbruchstellen_ms;
 import android.Manifest;
 import android.content.DialogInterface;
 import android.content.pm.PackageManager;
+import android.graphics.Color;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.FragmentActivity;
 import android.os.Bundle;
@@ -25,7 +26,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
     // Attributes
     private GoogleMap mMap;
-    private ArrayList<PolygonOptions> polygonList = new ArrayList<>();
+    private AufbruchstellenCollection aufbruchstellenCollection= new AufbruchstellenCollection();
 
     private static final int MY_PERMISSIONS_REQUEST_ACCESS_FINE_LOCATION = 1;
     private boolean mPermissionDenied = false;
@@ -56,7 +57,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         mMap = googleMap;
 
         // Add a marker in muenster and move the camera
-        LatLng muenster = new LatLng(7.626, 51.962);
+        LatLng muenster = new LatLng(51.962, 7.626);
         mMap.moveCamera(CameraUpdateFactory.newLatLng(muenster));
 
         // Methodenaufruf für eigenen Standort
@@ -66,7 +67,9 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         // Aufruf der Polygone
         //Aufgrabungsstellen aufgrabung = new Aufgrabungsstellen(URL);
         //polygonList = aufgrabung.getPolygonList();
-        addPolygon(mMap, polygonList);
+        for(int i = 0; i< aufbruchstellenCollection.getAufbruchstellenListe().size(); i++) {
+            addPolygon(mMap, aufbruchstellenCollection.getAufbruchstellenListe().get(i).getGeometrie());
+        }
         //******************************************
     }
 
@@ -121,7 +124,9 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     public void addPolygon (GoogleMap googleMap, ArrayList polygonList) {
       //for(polygon: polygonList) {
         for(int i = 0; i < polygonList.size(); i++) {
-            mMap.addPolygon((PolygonOptions) polygonList.get(i)).setClickable(true);
+           // PolygonOptions po = polygonList.get(i);
+           // mMap.addPolygon(polygonList.get(i));
         }
+       // mMap.addPolygon((PolygonOptions) polygonList.get(i)).setClickable(true);
     }
 }
