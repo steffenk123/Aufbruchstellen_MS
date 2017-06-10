@@ -9,6 +9,7 @@ import android.support.v4.app.FragmentActivity;
 import android.os.Bundle;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AlertDialog;
+import android.util.Log;
 
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
@@ -26,7 +27,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
     // Attributes
     private GoogleMap mMap;
-    private AufbruchstellenCollection aufbruchstellenCollection= new AufbruchstellenCollection();
+    private ArrayList<Aufbruchstellen> aufbruchstellenList;
 
     private static final int MY_PERMISSIONS_REQUEST_ACCESS_FINE_LOCATION = 1;
     private boolean mPermissionDenied = false;
@@ -67,14 +68,18 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         // Aufruf der Polygone
         //Aufgrabungsstellen aufgrabung = new Aufgrabungsstellen(URL);
         //polygonList = aufgrabung.getPolygonList();
-        PolygonOptions rectOptions = new PolygonOptions().add(new LatLng(51.962, 7.626),new LatLng(51.962, 7.726),new LatLng(51.762, 7.426));
+        Log.d("Test71", "Activity");
+        //for(int i = 0; i< aufbruchstellenCollection.getAufbruchstellenListe().size(); i++) {
+        aufbruchstellenList = Aufbruchstellen_Controller.getGML();
+            for(int i = 0; i < aufbruchstellenList.size(); i++) {
+                for(int j = 0; j < aufbruchstellenList.get(i).getGeometrie().size(); j++) {
+                    mMap.addPolygon(aufbruchstellenList.get(i).getGeometrie().get(j));
+                }
 
-        Polygon polygon = mMap.addPolygon(rectOptions);
+            }
 
 
-        for(int i = 0; i< aufbruchstellenCollection.getAufbruchstellenListe().size(); i++) {
-            addPolygon(mMap, aufbruchstellenCollection.getAufbruchstellenListe().get(i).getGeometrie());
-        }
+        Log.d("Test75", "Activity");
         //******************************************
     }
 
@@ -117,24 +122,5 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                         }).create().show();
             }
         }
-    }
-
-    /**
-     * Polygone aus der Liste auslesen und in der Karte darstellen
-     * zusaetzliche die Polygone klickbar machen
-     * @param googleMap
-     * @param polygonList
-     *
-     */
-    public void addPolygon (GoogleMap googleMap, ArrayList polygonList) {
-      //for(polygon: polygonList) {
-        PolygonOptions rectOptions = new PolygonOptions().add(new LatLng(51.962, 7.626),new LatLng(51.962, 7.726),new LatLng(51.762, 7.426));
-
-        Polygon polygon = mMap.addPolygon(rectOptions);
-      /*  for(int i = 0; i < polygonList.size(); i++) {
-           // PolygonOptions po = polygonList.get(i);
-           mMap.addPolygon(polygonList.get(i));
-        }*/
-       // mMap.addPolygon((PolygonOptions) polygonList.get(i)).setClickable(true);
     }
 }
