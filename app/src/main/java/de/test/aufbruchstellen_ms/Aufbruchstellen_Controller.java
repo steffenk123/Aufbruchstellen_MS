@@ -116,4 +116,6 @@ public class Aufbruchstellen_Controller {
         return point;
     }
 
+    //Test
+
  }

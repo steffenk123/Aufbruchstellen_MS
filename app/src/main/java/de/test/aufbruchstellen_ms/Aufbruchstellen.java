@@ -19,6 +19,7 @@ public class Aufbruchstellen {
     String spuren;
     String strassen;
 
+
     public Aufbruchstellen(int id, ArrayList<PolygonOptions> geometrie, String traeger, String beginn, String spuren, String strassen) {
         this.id = id;
         this.geometrie=  geometrie;
