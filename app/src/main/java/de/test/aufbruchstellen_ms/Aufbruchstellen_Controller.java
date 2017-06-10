@@ -150,6 +150,7 @@ public class Aufbruchstellen_Controller {
         Element element = (Element) node;
         String res = element.getTextContent();
         return res;
+        //test
     }
 
  }

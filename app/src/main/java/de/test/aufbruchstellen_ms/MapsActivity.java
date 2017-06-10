@@ -67,6 +67,11 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         // Aufruf der Polygone
         //Aufgrabungsstellen aufgrabung = new Aufgrabungsstellen(URL);
         //polygonList = aufgrabung.getPolygonList();
+        PolygonOptions rectOptions = new PolygonOptions().add(new LatLng(51.962, 7.626),new LatLng(51.962, 7.726),new LatLng(51.762, 7.426));
+
+        Polygon polygon = mMap.addPolygon(rectOptions);
+
+
         for(int i = 0; i< aufbruchstellenCollection.getAufbruchstellenListe().size(); i++) {
             addPolygon(mMap, aufbruchstellenCollection.getAufbruchstellenListe().get(i).getGeometrie());
         }
@@ -123,10 +128,13 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
      */
     public void addPolygon (GoogleMap googleMap, ArrayList polygonList) {
       //for(polygon: polygonList) {
-        for(int i = 0; i < polygonList.size(); i++) {
+        PolygonOptions rectOptions = new PolygonOptions().add(new LatLng(51.962, 7.626),new LatLng(51.962, 7.726),new LatLng(51.762, 7.426));
+
+        Polygon polygon = mMap.addPolygon(rectOptions);
+      /*  for(int i = 0; i < polygonList.size(); i++) {
            // PolygonOptions po = polygonList.get(i);
-           // mMap.addPolygon(polygonList.get(i));
-        }
+           mMap.addPolygon(polygonList.get(i));
+        }*/
        // mMap.addPolygon((PolygonOptions) polygonList.get(i)).setClickable(true);
     }
 }
