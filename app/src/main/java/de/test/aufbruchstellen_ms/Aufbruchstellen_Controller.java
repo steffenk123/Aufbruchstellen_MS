@@ -5,7 +5,6 @@ package de.test.aufbruchstellen_ms;
  */
 
 
-
 import android.annotation.TargetApi;
 import android.os.Build;
 import android.util.Log;
@@ -13,8 +12,10 @@ import android.util.Log;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.PolygonOptions;
 
+import java.io.BufferedInputStream;
 import java.io.BufferedReader;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.StringReader;
 import java.net.MalformedURLException;
@@ -22,6 +23,7 @@ import java.net.URL;
 import java.util.ArrayList;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
@@ -35,7 +37,6 @@ import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
 
 /**
- *
  * @author Steffen
  */
 public class Aufbruchstellen_Controller {
@@ -52,36 +53,31 @@ public class Aufbruchstellen_Controller {
         ArrayList<Aufbruchstellen> aufbruchstellenList = new ArrayList<>();
 
         try {
-            url = new URL("https://www.stadt-muenster.de/ows/mapserv621/odaufgrabserv?REQUEST=GetFeature&SERVICE=WFS&VERSION=1.1.0&TYPENAME=aufgrabungen&EXCEPTIONS=XML&MAXFEATURES=1000&SRSNAME=EPSG:4326");
+         //   url = new URL("https://www.stadt-muenster.de/ows/mapserv621/odaufgrabserv?REQUEST=GetFeature&SERVICE=WFS&VERSION=1.1.0&TYPENAME=aufgrabungen&EXCEPTIONS=XML&MAXFEATURES=1000&SRSNAME=EPSG:4326");
 
-            BufferedReader in = new BufferedReader(new InputStreamReader(url.openStream(), "UTF-8"));
-            String inputLine;
-            StringBuffer response = new StringBuffer();
-            while ((inputLine = in.readLine()) != null) {
-                response.append(inputLine);}
+//            BufferedReader in = new BufferedReader(new InputStreamReader(url.openStream(), "UTF-8"));
+//            String inputLine;
+//            StringBuffer response = new StringBuffer();
+//            while ((inputLine = in.readLine()) != null) {
+//                response.append(inputLine);
+//            }
 
-            String gml = response.toString();
-            System.out.println(gml);
+//            String gml = response.toString();
+
+            String gml = getXMLResponse("https://www.stadt-muenster.de/ows/mapserv621/odaufgrabserv?REQUEST=GetFeature&SERVICE=WFS&VERSION=1.1.0&TYPENAME=aufgrabungen&EXCEPTIONS=XML&MAXFEATURES=1000&SRSNAME=EPSG:4326");
 
             InputSource source = new InputSource(new StringReader(gml));
             DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
             DocumentBuilder db = dbf.newDocumentBuilder();
             Document document = db.parse(source);
 
-
-            //Durchläuft alle featureMember
-            String featm ="gml:featureMember";
+            //Durchlaeuft alle featureMember
+            String featm = "gml:featureMember";
             NodeList featmList = document.getElementsByTagName(featm);
 
-            // aufbruchstellenCollection = new AufbruchstellenCollection();
-
-
-            for(int i=0;i<featmList.getLength();i++) {
+            for (int i = 0; i < featmList.getLength(); i++) {
                 Node featmNode = featmList.item(i);
                 Element featmElement = (Element) featmNode;
-
-
-
 
                 //Und dann alle Positionslisten der einzelnen featureMember
                 String posl = "gml:posList";
@@ -93,64 +89,54 @@ public class Aufbruchstellen_Controller {
                     Element poslElement = (Element) poslNode;
                     String pos = poslElement.getTextContent();
                     // muss jetzt als geometrie gesetzt werden bzw vorher noch Methode geschrieben werden die das ins richtige Format (PolygonOptions oder Polygon) konvertiert
-                    PolygonOptions po= createPolygonOptions(createLatLngArray(pos));
+                    PolygonOptions po = createPolygonOptions(createLatLngArray(pos));
                     aufbruchstellen.addGeometrie(po);
                 }
 
                 // ID
-                String id = getValue("ms:id",0,featmElement);
+                String id = getValue("ms:id", 0, featmElement);
                 aufbruchstellen.setId(Integer.parseInt(id));
 
                 // Traeger
-                String traeger = getValue("ms:vtraeger",0,featmElement);
+                String traeger = getValue("ms:vtraeger", 0, featmElement);
                 aufbruchstellen.setTraeger(traeger);
 
                 // Beginn
-                String beginn = getValue("ms:beginn",0,featmElement);
+                String beginn = getValue("ms:beginn", 0, featmElement);
                 aufbruchstellen.setBeginn(beginn);
 
                 // Spuren
-                String spuren = getValue("ms:spuren",0,featmElement);
+                String spuren = getValue("ms:spuren", 0, featmElement);
                 aufbruchstellen.setSpuren(spuren);
 
                 // Strassen
-                String strassen = getValue("ms:strassen",0,featmElement);
+                String strassen = getValue("ms:strassen", 0, featmElement);
                 aufbruchstellen.setStrassen(strassen);
 
                 aufbruchstellenList.add(aufbruchstellen);
             }
 
-            // aufbruchstellenCollection.addAufbruchstelle(aufbruchstellen);
-
-        } catch (MalformedURLException ex) {
-            Logger.getLogger(Aufbruchstellen_Controller.class.getName()).log(Level.SEVERE, null, ex);
-        } catch (IOException ex) {
-            Logger.getLogger(Aufbruchstellen_Controller.class.getName()).log(Level.SEVERE, null, ex);
-        } catch (SAXException ex) {
-            Logger.getLogger(Aufbruchstellen_Controller.class.getName()).log(Level.SEVERE, null, ex);
-        } catch (ParserConfigurationException ex) {
+        } catch (Exception ex) {
             Logger.getLogger(Aufbruchstellen_Controller.class.getName()).log(Level.SEVERE, null, ex);
         }
 
         return aufbruchstellenList;
     }
 
-    public static LatLng[] createLatLngArray(String coordinates){
-
+    private static LatLng[] createLatLngArray(String coordinates) {
         String[] coord_string = coordinates.split(" ");
 
-        LatLng[] point = new LatLng[coord_string.length/2];
+        LatLng[] point = new LatLng[coord_string.length / 2];
 
-        int count=0;
-        for(int i=1; i<coord_string.length;i+=2){
-            point[count] = new LatLng(Double.parseDouble(coord_string[i-1]),Double.parseDouble(coord_string[i]));
+        int count = 0;
+        for (int i = 1; i < coord_string.length; i += 2) {
+            point[count] = new LatLng(Double.parseDouble(coord_string[i - 1]), Double.parseDouble(coord_string[i]));
             count++;
         }
         return point;
     }
 
-    public static PolygonOptions createPolygonOptions(LatLng[] latlng){
-
+    private static PolygonOptions createPolygonOptions(LatLng[] latlng) {
         PolygonOptions po = new PolygonOptions();
         po.add(latlng);
         Log.d("Test145", "Aufbruchstellen_Controller");
@@ -159,8 +145,7 @@ public class Aufbruchstellen_Controller {
         return new PolygonOptions().add(latlng);
     }
 
-    public static String getValue(String string, int i, Element featmElement){
-
+    private static String getValue(String string, int i, Element featmElement) {
         NodeList nodeList = featmElement.getElementsByTagName(string);
         Node node = nodeList.item(i);
         Element element = (Element) node;
@@ -168,4 +153,26 @@ public class Aufbruchstellen_Controller {
         return res;
     }
 
- }
+
+    private static String getXMLResponse(String request) throws Exception {
+        URL url = new URL(request);
+        InputStream in = url.openStream();
+        String outXml= "";
+
+        try{
+            BufferedInputStream bin = new BufferedInputStream(in);
+            int c = bin.read();
+
+            while (c != -1) {
+                outXml = outXml + (char) c;
+                c = bin.read();
+            }
+        } finally {
+            in.close();
+        }
+//        System.out.println(outXml);
+        return outXml;
+    }
+
+    // Test
+}
