@@ -13,10 +13,13 @@ import android.util.Log;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.PolygonOptions;
 
+import java.io.BufferedInputStream;
 import java.io.BufferedReader;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.StringReader;
+import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.ArrayList;
@@ -47,18 +50,24 @@ public class Aufbruchstellen_Controller {
     // CSV einlesen
     //@TargetApi(Build.VERSION_CODES.ICE_CREAM_SANDWICH)
     public static ArrayList<Aufbruchstellen> getGML() {
-        URL url;
+
         Aufbruchstellen aufbruchstellen = new Aufbruchstellen();
         ArrayList<Aufbruchstellen> aufbruchstellenList = new ArrayList<>();
 
         try {
-            url = new URL("https://www.stadt-muenster.de/ows/mapserv621/odaufgrabserv?REQUEST=GetFeature&SERVICE=WFS&VERSION=1.1.0&TYPENAME=aufgrabungen&EXCEPTIONS=XML&MAXFEATURES=1000&SRSNAME=EPSG:4326");
+            URL url = new URL("https://www.stadt-muenster.de/ows/mapserv621/odaufgrabserv?REQUEST=GetFeature&SERVICE=WFS&VERSION=1.1.0&TYPENAME=aufgrabungen&EXCEPTIONS=XML&MAXFEATURES=1000&SRSNAME=EPSG:4326");
 
-            BufferedReader in = new BufferedReader(new InputStreamReader(url.openStream(), "UTF-8"));
+            
+            HttpURLConnection urlConnection = (HttpURLConnection) url.openConnection();
+            InputStream in = new BufferedInputStream(urlConnection.getInputStream());
+            readStream(in);
+            urlConnection.disconnect();
+
+           /* BufferedReader in = new BufferedReader(new InputStreamReader(url.openStream(), "UTF-8"));
             String inputLine;
             StringBuffer response = new StringBuffer();
             while ((inputLine = in.readLine()) != null) {
-                response.append(inputLine);}
+                response.append(inputLine);}*/
 
             String gml = response.toString();
             System.out.println(gml);
