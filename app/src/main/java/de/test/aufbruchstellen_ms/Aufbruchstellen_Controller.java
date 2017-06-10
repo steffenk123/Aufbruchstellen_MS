@@ -57,17 +57,17 @@ public class Aufbruchstellen_Controller {
         try {
             URL url = new URL("https://www.stadt-muenster.de/ows/mapserv621/odaufgrabserv?REQUEST=GetFeature&SERVICE=WFS&VERSION=1.1.0&TYPENAME=aufgrabungen&EXCEPTIONS=XML&MAXFEATURES=1000&SRSNAME=EPSG:4326");
 
-            
+
             HttpURLConnection urlConnection = (HttpURLConnection) url.openConnection();
-            InputStream in = new BufferedInputStream(urlConnection.getInputStream());
-            readStream(in);
+           // InputStream in = new BufferedInputStream(urlConnection.getInputStream());
+           // readStream(in);
             urlConnection.disconnect();
 
-           /* BufferedReader in = new BufferedReader(new InputStreamReader(url.openStream(), "UTF-8"));
+           BufferedReader in = new BufferedReader(new InputStreamReader(url.openStream(), "UTF-8"));
             String inputLine;
             StringBuffer response = new StringBuffer();
             while ((inputLine = in.readLine()) != null) {
-                response.append(inputLine);}*/
+                response.append(inputLine);}
 
             String gml = response.toString();
             System.out.println(gml);
