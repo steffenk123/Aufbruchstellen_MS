@@ -37,12 +37,13 @@ public class AufbruchstellenController2 {
     public static ArrayList<Aufbruchstellen> getAufbruchstellenList(Document document){
         //Durchlaeuft alle featureMember
         //Aufbruchstelle anlegen
-        Aufbruchstellen aufbruchstellen = new Aufbruchstellen();
+
         ArrayList<Aufbruchstellen> aufbruchstellenList = new ArrayList<>();
         String featm = "gml:featureMember";
         NodeList featmList = document.getElementsByTagName(featm);
 
         for (int i = 0; i < featmList.getLength(); i++) {
+            Aufbruchstellen aufbruchstellen = new Aufbruchstellen();
             Node featmNode = featmList.item(i);
             Element featmElement = (Element) featmNode;
 
@@ -66,6 +67,7 @@ public class AufbruchstellenController2 {
             String id = getValue("ms:id", 0, featmElement);
             aufbruchstellen.setId(Integer.parseInt(id));
 
+
             // Traeger
             String traeger = getValue("ms:vtraeger", 0, featmElement);
             aufbruchstellen.setTraeger(traeger);
@@ -78,14 +80,13 @@ public class AufbruchstellenController2 {
             String spuren = getValue("ms:spuren", 0, featmElement);
             aufbruchstellen.setSpuren(spuren);
 
+
             // Strassen
             String strassen = getValue("ms:strassen", 0, featmElement);
             aufbruchstellen.setStrassen(strassen);
 
             aufbruchstellenList.add(aufbruchstellen);
         }
-
-
 
         return aufbruchstellenList;
     }
