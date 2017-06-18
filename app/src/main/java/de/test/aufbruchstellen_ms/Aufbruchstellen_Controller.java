@@ -6,9 +6,17 @@ package de.test.aufbruchstellen_ms;
 
 
 import android.annotation.TargetApi;
+import android.app.DownloadManager;
+import android.os.AsyncTask;
 import android.os.Build;
 import android.util.Log;
 
+import com.android.volley.Request;
+import com.android.volley.RequestQueue;
+import com.android.volley.Response;
+import com.android.volley.VolleyError;
+import com.android.volley.toolbox.StringRequest;
+import com.android.volley.toolbox.Volley;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.PolygonOptions;
 
@@ -18,8 +26,10 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.StringReader;
+import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.net.URLConnection;
 import java.util.ArrayList;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -36,42 +46,59 @@ import org.w3c.dom.NodeList;
 import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
 
+
 /**
  * @author Steffen
  */
-public class Aufbruchstellen_Controller {
+public class Aufbruchstellen_Controller extends AsyncTask<String, Void, Document> {
 
     // Aufbruchstellen aufbruchstellen;
     // AufbruchstellenCollection aufbruchstellenCollection;
+    //URL url;
+    static Aufbruchstellen aufbruchstellen = new Aufbruchstellen();
+    static ArrayList<Aufbruchstellen> aufbruchstellenList = new ArrayList<>();
+    static Document document;
 
-
-    // CSV einlesen
-    //@TargetApi(Build.VERSION_CODES.ICE_CREAM_SANDWICH)
-    public static ArrayList<Aufbruchstellen> getGML() {
-        URL url;
-        Aufbruchstellen aufbruchstellen = new Aufbruchstellen();
-        ArrayList<Aufbruchstellen> aufbruchstellenList = new ArrayList<>();
-
+    @Override
+    protected Document doInBackground(String... params) {
+        URL url = null;
+        Log.d("TEST","65");
         try {
-         //   url = new URL("https://www.stadt-muenster.de/ows/mapserv621/odaufgrabserv?REQUEST=GetFeature&SERVICE=WFS&VERSION=1.1.0&TYPENAME=aufgrabungen&EXCEPTIONS=XML&MAXFEATURES=1000&SRSNAME=EPSG:4326");
+            url = new URL("https://www.stadt-muenster.de/ows/mapserv621/odaufgrabserv?REQUEST=GetFeature&SERVICE=WFS&VERSION=1.1.0&TYPENAME=aufgrabungen&EXCEPTIONS=XML&MAXFEATURES=10&SRSNAME=EPSG:4326");
 
-//            BufferedReader in = new BufferedReader(new InputStreamReader(url.openStream(), "UTF-8"));
-//            String inputLine;
-//            StringBuffer response = new StringBuffer();
-//            while ((inputLine = in.readLine()) != null) {
-//                response.append(inputLine);
-//            }
 
-//            String gml = response.toString();
+/*            BufferedReader in = new BufferedReader(new InputStreamReader(url.openStream(), "UTF-8"));
+            String inputLine;
+            StringBuffer response = new StringBuffer();
+            while ((inputLine = in.readLine()) != null) {
+                response.append(inputLine);
+            } */
+            URLConnection conn = url.openConnection();
+            InputStream in = new BufferedInputStream(conn.getInputStream());
 
-            String gml = getXMLResponse("https://www.stadt-muenster.de/ows/mapserv621/odaufgrabserv?REQUEST=GetFeature&SERVICE=WFS&VERSION=1.1.0&TYPENAME=aufgrabungen&EXCEPTIONS=XML&MAXFEATURES=1000&SRSNAME=EPSG:4326");
+            String gml = in.toString();
+            Log.d("ZEILE80", gml);
+
+            // String gml = getXMLResponse("https://www.stadt-muenster.de/ows/mapserv621/odaufgrabserv?REQUEST=GetFeature&SERVICE=WFS&VERSION=1.1.0&TYPENAME=aufgrabungen&EXCEPTIONS=XML&MAXFEATURES=1000&SRSNAME=EPSG:4326");
+            //  gml = doInBackground();
 
             InputSource source = new InputSource(new StringReader(gml));
             DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
             DocumentBuilder db = dbf.newDocumentBuilder();
-            Document document = db.parse(source);
+            document = db.parse(source);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
 
+        return document;
+    }
+
+
+
+
+    public static ArrayList<Aufbruchstellen> getGML(){
             //Durchlaeuft alle featureMember
+
             String featm = "gml:featureMember";
             NodeList featmList = document.getElementsByTagName(featm);
 
@@ -116,9 +143,7 @@ public class Aufbruchstellen_Controller {
                 aufbruchstellenList.add(aufbruchstellen);
             }
 
-        } catch (Exception ex) {
-            Logger.getLogger(Aufbruchstellen_Controller.class.getName()).log(Level.SEVERE, null, ex);
-        }
+
 
         return aufbruchstellenList;
     }
@@ -173,6 +198,9 @@ public class Aufbruchstellen_Controller {
 //        System.out.println(outXml);
         return outXml;
     }
+
+
+
 
     // Test
 }
