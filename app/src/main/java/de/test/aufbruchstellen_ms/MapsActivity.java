@@ -2,8 +2,10 @@ package de.test.aufbruchstellen_ms;
 
 import android.Manifest;
 import android.content.DialogInterface;
+import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.graphics.Color;
+import android.net.Uri;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.FragmentActivity;
 import android.os.Bundle;
@@ -20,28 +22,37 @@ import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.gms.maps.model.Polygon;
 import com.google.android.gms.maps.model.PolygonOptions;
 
+import java.net.URLConnection;
 import java.util.ArrayList;
 import java.util.List;
 
-public class MapsActivity extends FragmentActivity implements OnMapReadyCallback {
+public class MapsActivity extends FragmentActivity implements OnMapReadyCallback, AsyncResponse {
 
     // Attributes
     private GoogleMap mMap;
     private ArrayList<Aufbruchstellen> aufbruchstellenList;
 
+
     private static final int MY_PERMISSIONS_REQUEST_ACCESS_FINE_LOCATION = 1;
     private boolean mPermissionDenied = false;
-
+    UrlConnection urlConnection;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_maps);
+
+
         // Obtain the SupportMapFragment and get notified when the map is ready to be used.
         SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager()
                 .findFragmentById(R.id.map);
         mapFragment.getMapAsync(this);
+        String s = "";
+
+        // urlConnection.delegate = this;
+
     }
+
 
 
     /**
@@ -56,31 +67,38 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     @Override
     public void onMapReady(GoogleMap googleMap) {
         mMap = googleMap;
+       // aufbruchstellenList = urlConnection.getAufbruchstellenList();
+      //  Log.d("Test Zeile 70", aufbruchstellenList.toString());
+        urlConnection = new UrlConnection(googleMap);
+        urlConnection.execute();
 
-        // Add a marker in muenster and move the camera
+
+     /*   // Add a marker in muenster and move the camera
         LatLng muenster = new LatLng(51.962, 7.626);
         mMap.moveCamera(CameraUpdateFactory.newLatLng(muenster));
 
         // Methodenaufruf für eigenen Standort
         enableMyLocation();
 
+       // Intent intent = new Intent(Intent.ACTION_VIEW, Uri.parse("https://www.stadt-muenster.de/ows/mapserv621/odaufgrabserv?REQUEST=GetFeature&SERVICE=WFS&VERSION=1.1.0&TYPENAME=aufgrabungen&EXCEPTIONS=XML&MAXFEATURES=1000&SRSNAME=EPSG:4326"));
+        //Log.d(intent., "TestIntent70");
         //**************************************
         // Aufruf der Polygone
         //Aufgrabungsstellen aufgrabung = new Aufgrabungsstellen(URL);
         //polygonList = aufgrabung.getPolygonList();
         Log.d("Test71", "Activity");
         //for(int i = 0; i< aufbruchstellenCollection.getAufbruchstellenListe().size(); i++) {
+        Aufbruchstellen_Controller ac= new Aufbruchstellen_Controller();
+        ac.doInBackground();
+
         aufbruchstellenList = Aufbruchstellen_Controller.getGML();
             for(int i = 0; i < aufbruchstellenList.size(); i++) {
                 for(int j = 0; j < aufbruchstellenList.get(i).getGeometrie().size(); j++) {
                     mMap.addPolygon(aufbruchstellenList.get(i).getGeometrie().get(j));
                 }
 
-            }
+            } */
 
-
-        Log.d("Test75", "Activity");
-        //******************************************
     }
 
     /**
@@ -99,6 +117,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     /**
      * dt. Methode faengt die Antwort des Dialogfensters der Standortberechtigung ab
      * und meldet bei fehlender Berechtigung, dass ein Standort nicht angezeigt werden
+     *
      * @param requestCode
      * @param permissions
      * @param grantResults
@@ -122,5 +141,11 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                         }).create().show();
             }
         }
+    }
+
+    @Override
+    public void processFinish(ArrayList<Aufbruchstellen> output) {
+
+
     }
 }
