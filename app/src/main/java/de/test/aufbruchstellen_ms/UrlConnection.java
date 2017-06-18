@@ -2,10 +2,14 @@ package de.test.aufbruchstellen_ms;
 
 import android.os.AsyncTask;
 import android.util.Log;
+import android.widget.TextView;
+import android.widget.Toast;
 
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MarkerOptions;
+import com.google.android.gms.maps.model.Polygon;
+import com.google.android.gms.maps.model.PolygonOptions;
 
 import org.w3c.dom.Document;
 
@@ -16,20 +20,25 @@ import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.ArrayList;
+import java.util.HashMap;
 
 /**
  * Created by Steffen on 18.06.2017.
  */
 
-public class UrlConnection extends AsyncTask<Void, Void, String> {
+public class UrlConnection extends AsyncTask<Void, Void, String>  {
 
     private static String urlString = "https://www.stadt-muenster.de/ows/mapserv621/odaufgrabserv?REQUEST=GetFeature&SERVICE=WFS&VERSION=1.1.0&TYPENAME=aufgrabungen&EXCEPTIONS=XML&MAXFEATURES=10&SRSNAME=EPSG:4326";
     ArrayList<Aufbruchstellen> aufbruchstellenList;
-    public AsyncResponse delegate = null;
     private GoogleMap googleMap;
+
+    private static HashMap<Polygon, String> polygonValues = new HashMap<>();
+
+
 
     public UrlConnection(GoogleMap googleMap) {
         this.googleMap = googleMap;
+
     }
 
     @Override
@@ -62,17 +71,26 @@ public class UrlConnection extends AsyncTask<Void, Void, String> {
 
     @Override
     protected void onPostExecute(String s) {
-        Log.d("Test zeile 54", s);
         Document document;
-        //ArrayList<Aufbruchstellen> aufbruchstellenList;
+
         try {
             document = AufbruchstellenController2.parseStringtoDocument(s);
-            Log.d("Test zeile 58", document.toString());
             aufbruchstellenList = AufbruchstellenController2.getAufbruchstellenList(document);
-            Log.d("Test zeile 62", aufbruchstellenList.toString());
-            //delegate.processFinish(aufbruchstellenList);
-            LatLng muenster = new LatLng(51.962, 7.626);
-            googleMap.addMarker(new MarkerOptions().position(muenster));
+
+
+
+            for (int i = 0; i < aufbruchstellenList.size(); i++) {
+                for (int j = 0; j < aufbruchstellenList.get(i).getGeometrie().size(); j++) {
+                   Polygon polygon = googleMap.addPolygon(aufbruchstellenList.get(i).getGeometrie().get(j).clickable(true));
+
+                    polygonValues.put(polygon, "ID: " + aufbruchstellenList.get(i).getId() + "\n" +
+                            "Träger: " + aufbruchstellenList.get(i).getTraeger() + "\n" +
+                            "Straßen: " + aufbruchstellenList.get(i).getStrassen() + "\n" +
+                            "Spuren: " + aufbruchstellenList.get(i).getSpuren() + "\n" +
+                            "Beginn: " + aufbruchstellenList.get(i).getBeginn() + "\n");
+
+                    }
+            }
 
         } catch (Exception e) {
             e.printStackTrace();
@@ -80,8 +98,13 @@ public class UrlConnection extends AsyncTask<Void, Void, String> {
 
     }
 
+
     public ArrayList<Aufbruchstellen> getAufbruchstellenList() {
         return aufbruchstellenList;
+    }
+
+    public HashMap<Polygon, String> getPolygonValues() {
+        return polygonValues;
     }
 }
 
