@@ -2,8 +2,10 @@ package de.test.aufbruchstellen_ms;
 
 import android.Manifest;
 import android.content.DialogInterface;
+import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.graphics.Color;
+import android.net.Uri;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.FragmentActivity;
 import android.os.Bundle;
@@ -64,19 +66,23 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         // Methodenaufruf für eigenen Standort
         enableMyLocation();
 
+        Intent intent = new Intent(Intent.ACTION_VIEW, Uri.parse("https://www.stadt-muenster.de/ows/mapserv621/odaufgrabserv?REQUEST=GetFeature&SERVICE=WFS&VERSION=1.1.0&TYPENAME=aufgrabungen&EXCEPTIONS=XML&MAXFEATURES=1000&SRSNAME=EPSG:4326"));
+        Log.d(intent.toString(), "TestIntent");
+
+        startActivity(intent);
         //**************************************
         // Aufruf der Polygone
         //Aufgrabungsstellen aufgrabung = new Aufgrabungsstellen(URL);
         //polygonList = aufgrabung.getPolygonList();
         Log.d("Test71", "Activity");
         //for(int i = 0; i< aufbruchstellenCollection.getAufbruchstellenListe().size(); i++) {
-        aufbruchstellenList = Aufbruchstellen_Controller.getGML();
-            for(int i = 0; i < aufbruchstellenList.size(); i++) {
-                for(int j = 0; j < aufbruchstellenList.get(i).getGeometrie().size(); j++) {
-                    mMap.addPolygon(aufbruchstellenList.get(i).getGeometrie().get(j));
-                }
+      //  aufbruchstellenList = Aufbruchstellen_Controller.getGML();
+      //      for(int i = 0; i < aufbruchstellenList.size(); i++) {
+      //          for(int j = 0; j < aufbruchstellenList.get(i).getGeometrie().size(); j++) {
+          //          mMap.addPolygon(aufbruchstellenList.get(i).getGeometrie().get(j));
+        //        }
 
-            }
+          //  }
 
 
         Log.d("Test75", "Activity");
