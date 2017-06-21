@@ -82,7 +82,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         //  Log.d("Test Zeile 70", aufbruchstellenList.toString());
         urlConnection = new UrlConnection(googleMap);
 
-   /*   urlConnection.execute();
+    /*  urlConnection.execute();
         while (urlConnection.getResultString().isEmpty()){
             Log.d("Zeile87", "empty");
         }
@@ -136,6 +136,8 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
      * @param grantResults
      * @throws SecurityException
      */
+
+
     public void onRequestPermissionsResult(int requestCode, String[] permissions, int[] grantResults) throws SecurityException {
 
         if (requestCode == MY_PERMISSIONS_REQUEST_ACCESS_FINE_LOCATION) {
@@ -153,6 +155,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                             }
                         }).create().show();
             }
+
         }
     }
 
