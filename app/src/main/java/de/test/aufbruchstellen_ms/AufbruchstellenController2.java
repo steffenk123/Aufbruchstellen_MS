@@ -67,7 +67,7 @@ public class AufbruchstellenController2 {
                 PolygonOptions po = createPolygonOptions(createLatLngArray(pos));
                 aufbruchstellen.addGeometrie(po);
             }
-
+//
             // ID
             String id = getValue("ms:id", 0, featmElement);
             aufbruchstellen.setId(Integer.parseInt(id));
