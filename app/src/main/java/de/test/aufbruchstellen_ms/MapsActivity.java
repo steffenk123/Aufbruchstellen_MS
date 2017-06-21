@@ -1,8 +1,10 @@
 package de.test.aufbruchstellen_ms;
 
 import android.Manifest;
+import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.graphics.Color;
 import android.net.Uri;
@@ -28,6 +30,8 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+
+import static android.os.Build.VERSION_CODES.M;
 
 public class MapsActivity extends FragmentActivity implements OnMapReadyCallback, GoogleMap.OnPolygonClickListener {
 
@@ -77,7 +81,22 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         // aufbruchstellenList = urlConnection.getAufbruchstellenList();
         //  Log.d("Test Zeile 70", aufbruchstellenList.toString());
         urlConnection = new UrlConnection(googleMap);
-        urlConnection.execute();
+
+   /*   urlConnection.execute();
+        while (urlConnection.getResultString().isEmpty()){
+            Log.d("Zeile87", "empty");
+        }
+        Log.d("Zeile 86", urlConnection.getResultString());
+        save(urlConnection.getResultString());
+*/
+
+        String value = getValue();
+        urlConnection.buildPolygons(value);
+
+        // Nur im Hintergund
+
+
+
 
 
 
@@ -142,5 +161,31 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         polygonValues = urlConnection.getPolygonValues();
         infoPolygon.setText(polygonValues.get(polygon));
 
+
+    }
+
+    public void save(String text){
+       /* SharedPreferences settings;
+        SharedPreferences.Editor editor;
+        settings = context.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE);
+        editor = settings.edit();
+
+        editor.putString(PREFS_KEY, text);
+        editor.commit();*/
+        SharedPreferences sharedPreferences;
+        sharedPreferences = getSharedPreferences("MyPrefs",Context.MODE_PRIVATE);
+        SharedPreferences.Editor editor = sharedPreferences.edit();
+        editor.putString("Aufbruchstellen", text);
+        Log.d("Zeile 175", text);
+        editor.commit();
+    }
+
+    public String getValue() {
+        SharedPreferences sharedPreferences;
+        String text;
+        sharedPreferences = getSharedPreferences("MyPrefs", Context.MODE_PRIVATE);
+        text = sharedPreferences.getString("Aufbruchstellen",null);
+        Log.d("Zeile 183", text);
+        return text;
     }
 }

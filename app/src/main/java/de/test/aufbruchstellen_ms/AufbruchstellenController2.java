@@ -1,5 +1,7 @@
 package de.test.aufbruchstellen_ms;
 
+import android.content.Context;
+import android.content.SharedPreferences;
 import android.util.Log;
 
 import com.google.android.gms.maps.model.LatLng;
@@ -23,6 +25,9 @@ import javax.xml.parsers.ParserConfigurationException;
  */
 
 public class AufbruchstellenController2 {
+
+
+
 
     public static Document parseStringtoDocument(String xml) throws Exception {
         InputSource source = new InputSource(new StringReader(xml));
@@ -119,5 +124,7 @@ public class AufbruchstellenController2 {
         String res = element.getTextContent();
         return res;
     }
+
+
 
 }
