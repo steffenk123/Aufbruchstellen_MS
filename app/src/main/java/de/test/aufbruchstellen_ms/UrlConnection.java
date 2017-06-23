@@ -1,7 +1,6 @@
 package de.test.aufbruchstellen_ms;
 
 import android.os.AsyncTask;
-import android.util.Log;
 
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.model.Polygon;
@@ -22,7 +21,7 @@ import java.util.HashMap;
 
 public class UrlConnection extends AsyncTask<Void, Void, String> {
 
-    private static String urlString = "https://www.stadt-muenster.de/ows/mapserv621/odaufgrabserv?REQUEST=GetFeature&SERVICE=WFS&VERSION=1.1.0&TYPENAME=aufgrabungen&EXCEPTIONS=XML&MAXFEATURES=500&SRSNAME=EPSG:4326";
+    private static String urlString = "https://www.stadt-muenster.de/ows/mapserv621/odaufgrabserv?REQUEST=GetFeature&SERVICE=WFS&VERSION=1.1.0&TYPENAME=aufgrabungen&EXCEPTIONS=XML&MAXFEATURES=50&SRSNAME=EPSG:4326";
     private ArrayList<Aufbruchstellen> aufbruchstellenList;
     private ArrayList<Polygon> removeList = new ArrayList<>();
     private static HashMap<Polygon, String> polygonValues = new HashMap<>();
@@ -87,8 +86,8 @@ public class UrlConnection extends AsyncTask<Void, Void, String> {
      * @throws Exception
      */
     public void buildPolygons(String s) throws Exception {
-        Document document = AufbruchstellenController2.parseStringtoDocument(s);
-        aufbruchstellenList = AufbruchstellenController2.getAufbruchstellenList(document);
+        Document document = AufbruchstellenController.parseStringtoDocument(s);
+        aufbruchstellenList = AufbruchstellenController.getAufbruchstellenList(document);
 
         // Alle Polygone loeschen und Liste leeren
         removeAllPolygons();
