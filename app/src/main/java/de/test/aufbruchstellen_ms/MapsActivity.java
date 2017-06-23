@@ -5,12 +5,18 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
+import android.location.Address;
+import android.location.Geocoder;
 import android.os.Handler;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.FragmentActivity;
 import android.os.Bundle;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AlertDialog;
+import android.text.method.ScrollingMovementMethod;
+import android.util.Log;
+import android.view.View;
+import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -20,10 +26,14 @@ import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.LatLng;
+import com.google.android.gms.maps.model.Marker;
+import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.gms.maps.model.Polygon;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
+import java.util.Locale;
 
 public class MapsActivity extends FragmentActivity implements OnMapReadyCallback, GoogleMap.OnPolygonClickListener {
 
@@ -45,6 +55,10 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     private TextView infoPolygon;
     private EditText address;
     private Context context;
+    private EditText adressfield;
+
+    private String adress;
+    private Marker marker;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -58,6 +72,19 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
         infoPolygon = (TextView) findViewById(R.id.infoPolygon);
         context = this;
+
+        Button button = (Button)findViewById(R.id.startgeocode);
+        adressfield =  (EditText) findViewById(R.id.getAdress);
+
+        button.setOnClickListener(new View.OnClickListener(){
+            public void onClick(View v) {
+                try {
+                    getGeo(adressfield.getText().toString());
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+            }
+        });
     }
 
 
@@ -150,6 +177,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     public void onPolygonClick(Polygon polygon) {
         polygonValues = urlConnection.getPolygonValues();
         infoPolygon.setText(polygonValues.get(polygon));
+        infoPolygon.setMovementMethod(new ScrollingMovementMethod());
     }
 
     /**
@@ -195,12 +223,30 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     };
 
 
-   /* public void getGeo(String address) throws Exception {
-        Geocoder geoCoder = new Geocoder(this, Locale.getDefault());
+   public void getGeo(String address) throws Exception {
+        Geocoder geoCoder = new Geocoder(this, Locale.GERMANY);
+        Log.d("Zeile 221", address);
 
-        List<Address> addresses = geoCoder.getFromLocationName(address, 1);
-        infoPolygon.setText(addresses.size());
+        try {
+            List<Address> addresses = geoCoder.getFromLocationName(address, 1);
 
-    }*/
+
+            Address adress = addresses.get(0);
+
+            LatLng coord = new LatLng(adress.getLatitude(), adress.getLongitude());
+            mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(coord, 15));
+            if (marker != null) {
+                marker.remove();
+            }
+            marker = mMap.addMarker(new MarkerOptions().position(coord));
+        }catch(IndexOutOfBoundsException indexOutOfBoundsException){
+            Toast.makeText(context, "Keine Adresse gefunden!", Toast.LENGTH_SHORT).show();
+       }
+
+
+       //infoPolygon.setText(addresses.size());
+
+    }
+
 
 }

@@ -24,7 +24,7 @@ import javax.xml.parsers.ParserConfigurationException;
  * Created by Steffen on 18.06.2017.
  */
 
-public class AufbruchstellenController2 {
+public class AufbruchstellenController {
 
 
 

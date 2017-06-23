@@ -5,12 +5,24 @@
 
     android:orientation="vertical">
 
-    <TextView
-        android:id="@+id/textView"
-        android:layout_width="fill_parent"
+    <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="Platzhalter fuer Adresssuche"
-        android:gravity="center"/>
+
+        android:orientation="vertical"
+        android:focusable="true"
+        android:focusableInTouchMode="true">
+
+        <EditText
+            android:id="@+id/getAdress"
+            android:layout_width="416dp"
+            android:layout_height="wrap_content"
+            android:ems="10"
+            android:hint="Adresse"
+            android:inputType="textPersonName"
+            />
+
+    </LinearLayout>
 
     <FrameLayout
         xmlns:map="http://schemas.android.com/apk/res-auto"
@@ -26,6 +38,12 @@
             android:layout_height="472dp"
             tools:context="de.test.aufbruchstellen_ms.MapsActivity" />
 
+        <Button
+            android:id="@+id/startgeocode"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Suche" />
+
     </FrameLayout>
 
 
@@ -34,7 +52,8 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:gravity="center"
-        android:text="TextView" />
+        android:text="Info-Fenster"
+        android:scrollbars="vertical"/>
 
 
 
