@@ -38,7 +38,7 @@ public class UrlConnection extends AsyncTask<Void, Void, String> {
         this.removeList = removeList;
     }
 
-    /**
+    /**a
      * @param params
      * @return
      */
