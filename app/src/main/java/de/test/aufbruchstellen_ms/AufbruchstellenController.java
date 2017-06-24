@@ -26,9 +26,12 @@ import javax.xml.parsers.ParserConfigurationException;
 
 public class AufbruchstellenController {
 
-
-
-
+    /**
+     * 
+     * @param xml
+     * @return
+     * @throws Exception
+     */
     public static Document parseStringtoDocument(String xml) throws Exception {
         InputSource source = new InputSource(new StringReader(xml));
         DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
