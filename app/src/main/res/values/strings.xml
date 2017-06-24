@@ -1,4 +1,7 @@
 <resources>
     <string name="app_name">Aufbruchstellen_MS</string>
-    <string name="title_activity_maps">Map</string>
+    <string name="title_activity_maps">Aufbruch Meldungen</string>
+    <string name="such_button">Suche</string>
+    <string name="adress_field">Adresse</string>
+
 </resources>
