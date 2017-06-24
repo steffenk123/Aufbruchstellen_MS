@@ -39,24 +39,29 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
     // Attributes
     private GoogleMap mMap;
-    private ArrayList<Aufbruchstellen> aufbruchstellenList;
+    private ArrayList<Aufbruchstelle> aufbruchstellenList;
     private HashMap<Polygon, String> polygonValues;
-    private boolean mPermissionDenied = false;
     private UrlConnection urlConnection;
 
-    private ArrayList<Polygon> removeList = new ArrayList<>();
-    private final int POLYGON_UPDATE_INTERVAL = 60000;
+    // Attributes to handle the async-task
+    private final int POLYGON_UPDATE_INTERVAL = 6000000;
     private final Handler handler = new Handler();
 
+    // Attributes for location-permission
     private static final int MY_PERMISSIONS_REQUEST_ACCESS_FINE_LOCATION = 1;
-    private static final String PREFERENCE = "Aufbruchstellen";
+    private boolean mPermissionDenied = false;
+
+    // Attributes to persist polygons
+    private static final String PREFERENCE = "Aufbruchstelle";
     private static final String KEY_STRING = "Datensatz";
 
+    // GUI-attributes
     private TextView infoPolygon;
     private EditText address;
     private Context context;
     private EditText adressfield;
 
+    // Attributes for geocoding
     private String adress;
     private Marker marker;
 
@@ -73,10 +78,10 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         infoPolygon = (TextView) findViewById(R.id.infoPolygon);
         context = this;
 
-        Button button = (Button)findViewById(R.id.startgeocode);
-        adressfield =  (EditText) findViewById(R.id.getAdress);
+        Button button = (Button) findViewById(R.id.startgeocode);
+        adressfield = (EditText) findViewById(R.id.getAdress);
 
-        button.setOnClickListener(new View.OnClickListener(){
+        button.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
                 try {
                     getGeo(adressfield.getText().toString());
@@ -102,47 +107,46 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         mMap = googleMap;
 
         // Neue URLConnection anlegen und String mit letztem Response aus einer Datei auslesen und daraus Polygone erstellen
-        urlConnection = new UrlConnection(mMap, removeList);
+        urlConnection = new UrlConnection(mMap);
 
-        int updateIntervall = POLYGON_UPDATE_INTERVAL;
+        int updateIntervall = 0;
         try {
             String value = getValue();
-            urlConnection.buildPolygons(value);
+            //urlConnection.buildPolygons(value);
+            PolygonController.buildPolygons(value, mMap);
         } catch (Exception ex) {
-            updateIntervall = 0;
-            Toast.makeText(context, "Aufbruchstellen werden geladen!", Toast.LENGTH_SHORT).show();
+            //updateIntervall = 0;
+            Toast.makeText(context, "Aufbruchstelle werden geladen!", Toast.LENGTH_SHORT).show();
         }
 
-        // Fuehrt den Hintergund Thread aus um die Polygone zu aktualisieren
+        // execute the async-task to update the polygons
         handler.postDelayed(updatePolygons, updateIntervall);
         updateIntervall = POLYGON_UPDATE_INTERVAL;
 
-        //Add a marker in muenster and move the camera
+        // start position
         LatLng muenster = new LatLng(51.962, 7.626);
         mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(muenster, 12));
         mMap.getUiSettings().setZoomControlsEnabled(true);
 
-        // Clicklistener setzen, um die POlygone Clickbar zu machen
         mMap.setOnPolygonClickListener(this);
 
-        // Methodenaufruf für eigenen Standort
         enableMyLocation();
     }
 
-
+    /**
+     * Method checks whether permisson is set
+     */
     public void enableMyLocation() {
         if (ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION)
                 == PackageManager.PERMISSION_GRANTED) {
             mMap.setMyLocationEnabled(true);
         } else {
-            // Berechtigung
             ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.ACCESS_FINE_LOCATION}, MY_PERMISSIONS_REQUEST_ACCESS_FINE_LOCATION);
         }
     }
 
     /**
-     * dt. Methode faengt die Antwort des Dialogfensters der Standortberechtigung ab
-     * und meldet bei fehlender Berechtigung, dass ein Standort nicht angezeigt werden
+     * Method is called if permission is not set and asks the user again
      *
      * @param requestCode
      * @param permissions
@@ -170,18 +174,19 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     }
 
     /**
-     * Liefert die Information zu einem gewaehlten Polygon
+     * Method shows the information-window of the polygon
      *
      * @param polygon
      */
     public void onPolygonClick(Polygon polygon) {
-        polygonValues = urlConnection.getPolygonValues();
+        //polygonValues = urlConnection.getPolygonValues();
+        polygonValues = PolygonController.getPolygonValues();
         infoPolygon.setText(polygonValues.get(polygon));
         infoPolygon.setMovementMethod(new ScrollingMovementMethod());
     }
 
     /**
-     * Speichert die Aufbruchstellen als String
+     * Method saves the Aufbruchstelle-xml as String in the sharedPreferences
      *
      * @param text
      */
@@ -193,7 +198,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     }
 
     /**
-     * gibt den gespeciherten String mit den Aufbruchstellen aus
+     * Method returns the sharedPreference value
      *
      * @return
      */
@@ -203,18 +208,17 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     }
 
     /**
-     * Laedt im Hintergund die Aufbruchstellen neu
+     * Method updates the Aufbruchstellen in background
      */
     Runnable updatePolygons = new Runnable() {
         public void run() {
             // Zuletzt abgerufene Daten speichern
             if (!urlConnection.getResultString().isEmpty()) {
                 save(urlConnection.getResultString());
-                Toast.makeText(context, "Aufbruchstellen wurden aktualisiert!", Toast.LENGTH_SHORT).show();
+                Toast.makeText(context, "Aufbruchstelle wurden aktualisiert!", Toast.LENGTH_SHORT).show();
             }
 
-            removeList = urlConnection.getRemoveList();
-            urlConnection = new UrlConnection(mMap, removeList);
+            urlConnection = new UrlConnection(mMap);
 
             // Ausfuehren
             urlConnection.execute();
@@ -222,15 +226,18 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         }
     };
 
-
-   public void getGeo(String address) throws Exception {
+    /**
+     * Method get an adress as a String and move the camera to the adress
+     *
+     * @param address
+     * @throws Exception
+     */
+    public void getGeo(String address) throws Exception {
         Geocoder geoCoder = new Geocoder(this, Locale.GERMANY);
         Log.d("Zeile 221", address);
 
         try {
             List<Address> addresses = geoCoder.getFromLocationName(address, 1);
-
-
             Address adress = addresses.get(0);
 
             LatLng coord = new LatLng(adress.getLatitude(), adress.getLongitude());
@@ -239,12 +246,9 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                 marker.remove();
             }
             marker = mMap.addMarker(new MarkerOptions().position(coord));
-        }catch(IndexOutOfBoundsException indexOutOfBoundsException){
+        } catch (IndexOutOfBoundsException indexOutOfBoundsException) {
             Toast.makeText(context, "Keine Adresse gefunden!", Toast.LENGTH_SHORT).show();
-       }
-
-
-       //infoPolygon.setText(addresses.size());
+        }
 
     }
 

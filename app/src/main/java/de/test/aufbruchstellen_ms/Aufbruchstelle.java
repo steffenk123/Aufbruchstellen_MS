@@ -5,13 +5,14 @@ import com.google.android.gms.maps.model.PolygonOptions;
 import java.util.ArrayList;
 
 /**
- * Created by Steffen on 09.06.2017.
+ * Created by Steffen and Sven on 09.06.2017.
+ * <p>
+ * Represent an object of an Aufbruchstelle, which contains the appropriate attributes
  */
 
-public class Aufbruchstellen {
+public class Aufbruchstelle {
 
-    // Arraylist in Konstruktor/Getter/Setter fehlt noch
-
+    // Attributes
     private int id;
     private ArrayList<PolygonOptions> geometrie;
     private String traeger;
@@ -19,19 +20,12 @@ public class Aufbruchstellen {
     private String spuren;
     private String strassen;
 
-    public Aufbruchstellen() {
-        this.geometrie=  new ArrayList<>();
+    // Constructor
+    public Aufbruchstelle() {
+        this.geometrie = new ArrayList<>();
     }
 
-    public Aufbruchstellen(int id, String traeger, String beginn, String spuren, String strassen) {
-        this.id = id;
-        this.geometrie=  new ArrayList<>();
-        this.traeger = traeger;
-        this.beginn = beginn;
-        this.spuren = spuren;
-        this.strassen = strassen;
-    }
-
+    // Getter- / Setter-Methods
     public int getId() {
         return id;
     }
@@ -79,6 +73,4 @@ public class Aufbruchstellen {
     public void addGeometrie(PolygonOptions geometrie) {
         this.geometrie.add(geometrie);
     }
-
-
 }
