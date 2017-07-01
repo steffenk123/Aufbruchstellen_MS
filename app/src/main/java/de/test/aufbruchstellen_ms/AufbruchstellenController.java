@@ -27,7 +27,7 @@ import javax.xml.parsers.ParserConfigurationException;
 public class AufbruchstellenController {
 
     /**
-     * 
+     *
      * @param xml
      * @return
      * @throws Exception

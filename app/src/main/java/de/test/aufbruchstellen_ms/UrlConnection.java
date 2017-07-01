@@ -38,11 +38,12 @@ public class UrlConnection extends AsyncTask<Void, Void, String> {
         this.removeList = removeList;
     }
 
-    /**a
+    /**
      * @param params
      * @return
      */
     protected String doInBackground(Void... params) {
+        // time =
         try {
             URL url = new URL(urlString);
             HttpURLConnection httpURLConnection = (HttpURLConnection) url.openConnection();

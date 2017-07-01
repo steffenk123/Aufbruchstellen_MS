@@ -103,7 +103,11 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
         // Neue URLConnection anlegen und String mit letztem Response aus einer Datei auslesen und daraus Polygone erstellen
         urlConnection = new UrlConnection(mMap, removeList);
-
+        try {
+            urlConnection.buildPolygons("test");
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
         int updateIntervall = POLYGON_UPDATE_INTERVAL;
         try {
             String value = getValue();
@@ -212,7 +216,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                 save(urlConnection.getResultString());
                 Toast.makeText(context, "Aufbruchstellen wurden aktualisiert!", Toast.LENGTH_SHORT).show();
             }
-
+            urlConnection.getStatus();
             removeList = urlConnection.getRemoveList();
             urlConnection = new UrlConnection(mMap, removeList);
 
