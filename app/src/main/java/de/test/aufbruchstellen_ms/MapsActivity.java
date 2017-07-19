@@ -5,6 +5,7 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
+import android.graphics.Color;
 import android.location.Address;
 import android.location.Geocoder;
 import android.os.Handler;
@@ -64,6 +65,9 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     // Attributes for geocoding
     private String adress;
     private Marker marker;
+
+    // Polygon
+    private Polygon colourPolygon = null;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -180,9 +184,18 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
      */
     public void onPolygonClick(Polygon polygon) {
         //polygonValues = urlConnection.getPolygonValues();
+        if(colourPolygon!=null){
+            colourPolygon.setFillColor(Color.TRANSPARENT);
+            colourPolygon.setStrokeColor(Color.BLACK);}
+
+        polygon.setFillColor(Color.YELLOW);
+        polygon.setStrokeColor(Color.YELLOW);
+
         polygonValues = PolygonController.getPolygonValues();
         infoPolygon.setText(polygonValues.get(polygon));
         infoPolygon.setMovementMethod(new ScrollingMovementMethod());
+
+        colourPolygon = polygon;
     }
 
     /**
